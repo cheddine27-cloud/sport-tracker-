@@ -1,0 +1,15 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/db-test/page": "/db-test",
+  "/distributors/page": "/distributors",
+  "/expenses/page": "/expenses",
+  "/exports/page": "/exports",
+  "/favicon.ico/route": "/favicon.ico",
+  "/inventory/page": "/inventory",
+  "/page": "/",
+  "/pos/page": "/pos",
+  "/products/page": "/products",
+  "/settings/page": "/settings",
+  "/statistics/page": "/statistics"
+}

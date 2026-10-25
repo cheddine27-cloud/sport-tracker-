@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Static smoke test for the products UI (no browser needed).
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -138,14 +138,48 @@ check('distributors page is not a placeholder', !distSrc.includes('ComingSoon'))
 check('distributors page imports distributors service', distSrc.includes('@/services/distributors'));
 check('distributors page imports openUrl from plugin-opener', distSrc.includes('@tauri-apps/plugin-opener') && distSrc.includes('openUrl'));
 check('distributors page imports phone helper', distSrc.includes('@/lib/phone'));
-for (const label of ['الموزعون', 'إضافة موزع', 'واتساب', 'رسالة فارغة']) {
+for (const label of ['الموزعون', 'إضافة موزع', 'واتساب']) {
   check(`distributors label "${label}"`, distSrc.includes(label));
 }
+// "رسالة فارغة" lives in the shared templates (src/lib/labels.ts), used by the page dropdown.
+const labelsSrc = readFileSync(join(root, 'src/lib/labels.ts'), 'utf8');
+check('distributors page uses WHATSAPP_MESSAGE_TEMPLATES', distSrc.includes('WHATSAPP_MESSAGE_TEMPLATES'));
+check('empty-message template label "رسالة فارغة" in labels.ts', labelsSrc.includes('رسالة فارغة'));
 check('no dynamic route /distributors/[id]', !existsSync(join(root, 'src/app/distributors/[id]')));
 
 // RTL logical utilities only (no physical mr-/ml-/pl-/pr- class prefixes)
 const rtlViolations = [...allUi.matchAll(/className="[^"]*\b(?:mr|ml|pl|pr)-[\d.]/g)];
 check('no physical margin/padding utilities (mr-, ml-, pl-, pr-)', rtlViolations.length === 0);
+
+// ===== Stage 10: settings, dashboard, invoice printing =====
+const setPath = join(root, 'src/app/settings/page.tsx');
+const setSrc = readFileSync(setPath, 'utf8');
+check('settings page is not a placeholder', !setSrc.includes('ComingSoon'));
+check('settings page imports settings service', setSrc.includes('@/services/settings'));
+check('settings page imports backup ops', setSrc.includes('@/lib/backupOps'));
+for (const label of ['الإعدادات', 'نسخة احتياطية الآن', 'استعادة نسخة', 'فحص سلامة المخزون', 'معلومات المحل']) {
+  check(`settings label "${label}"`, setSrc.includes(label));
+}
+const dashPath = join(root, 'src/app/page.tsx');
+const dashSrc = readFileSync(dashPath, 'utf8');
+check('dashboard is not a placeholder', !dashSrc.includes('ComingSoon'));
+check('dashboard imports statistics service', dashSrc.includes('@/services/statistics'));
+check('dashboard imports sales service', dashSrc.includes('@/services/sales'));
+check('dashboard imports stock service', dashSrc.includes('@/services/stock'));
+check('dashboard uses recharts', dashSrc.includes('recharts'));
+for (const label of ['لوحة التحكم', 'مبيعات اليوم', 'ربح اليوم', 'قيمة المخزون', 'طلبات قيد الانتظار', 'بيع جديد', 'طلب جديد', 'إضافة منتج', 'منتجات تحتاج تزويدا']) {
+  check(`dashboard label "${label}"`, dashSrc.includes(label));
+}
+const invPath = join(root, 'src/lib/invoice.ts');
+const invSrc = readFileSync(invPath, 'utf8');
+check('invoice builder exists with RTL html', invSrc.includes('buildInvoiceHtml') && invSrc.includes('dir="rtl"'));
+check('invoice escapes html', invSrc.includes('escapeHtml'));
+check('pos page has print button', posSrc.includes('طباعة') && posSrc.includes('@/lib/invoice'));
+check('exports page has print button', exportsSrc.includes('طباعة الفاتورة') && exportsSrc.includes('@/lib/invoice'));
+check('no ComingSoon anywhere in src/app pages', (() => {
+  const files = readdirSync(join(root, 'src/app'), { recursive: true }).filter((f) => String(f).endsWith('page.tsx'));
+  return files.every((f) => !readFileSync(join(root, 'src/app', String(f)), 'utf8').includes('ComingSoon'));
+})());
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail > 0 ? 1 : 0);

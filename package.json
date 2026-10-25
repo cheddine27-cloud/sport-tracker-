@@ -16,7 +16,9 @@
     "test:exports": "tsx scripts/test-exports.mjs",
     "test:expenses": "tsx scripts/test-expenses.mjs",
     "test:statistics": "tsx scripts/test-statistics.mjs",
-    "test:distributors": "tsx scripts/test-distributors.mjs"
+    "test:distributors": "tsx scripts/test-distributors.mjs",
+    "test:settings": "tsx scripts/test-settings.mjs",
+    "test:backup": "tsx scripts/test-backup.mjs"
   },
   "dependencies": {
     "@hugeicons/core-free-icons": "^4.3.5",

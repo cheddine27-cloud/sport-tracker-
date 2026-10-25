@@ -22,6 +22,8 @@ import {
 import { appDb } from '@/lib/db';
 import { formatMoney, formatDate } from '@/lib/format';
 import { whatsappUrl } from '@/lib/phone';
+import { getSettings } from '@/services/settings';
+import { buildInvoiceHtml, printInvoice } from '@/lib/invoice';
 import { SALE_STATUS_LABELS, SALE_STATUS_BADGE } from '@/lib/labels';
 import {
   getSales, getSaleById, confirmOutsideSale, cancelOutsideSale, getSalesSummary,
@@ -35,6 +37,17 @@ const TABS: { key: SaleStatus; label: string }[] = [
   { key: 'confirmed', label: 'مؤكد' },
   { key: 'cancelled', label: 'ملغي' },
 ];
+
+async function doPrintInvoice(saleId: number) {
+  try {
+    const sale = await getSaleById(appDb, saleId);
+    if (!sale) { toast.error('تعذر تحميل الفاتورة'); return; }
+    const shop = await getSettings(appDb);
+    await printInvoice(buildInvoiceHtml(sale, shop));
+  } catch (e) {
+    toast.error((e as Error).message || 'تعذر الطباعة');
+  }
+}
 
 function itemsSummary(s: SaleWithItems): string {
   return s.items.map((i) => `${i.product_name} ×${i.quantity}`).join('، ');
@@ -333,9 +346,12 @@ export default function ExportsPage() {
                 <div className="flex justify-between font-semibold"><span>الإجمالي:</span><span>{formatMoney(details.total)}</span></div>
                 <div className="flex justify-between text-emerald-700"><span>الربح:</span><span>{formatMoney(details.profit)}</span></div>
               </div>
-              <p className="text-xs">
-                <Link href="/inventory" className="text-blue-600 underline">عرض المخزون</Link>
-              </p>
+              <div className="flex items-center justify-between pt-1">
+                <p className="text-xs">
+                  <Link href="/inventory" className="text-blue-600 underline">عرض المخزون</Link>
+                </p>
+                <Button size="sm" variant="outline" onClick={() => void doPrintInvoice(details.id)}>طباعة الفاتورة</Button>
+              </div>
             </div>
           )}
         </DialogContent>
