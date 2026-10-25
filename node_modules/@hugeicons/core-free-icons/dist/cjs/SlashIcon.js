@@ -1,0 +1,7 @@
+'use strict';
+
+const SlashIcon = [
+  ["path", { d: "M3.99219 20L19.9922 4", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "0" }]
+];
+
+module.exports = SlashIcon;
