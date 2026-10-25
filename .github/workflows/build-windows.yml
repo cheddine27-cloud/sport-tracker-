@@ -7,7 +7,42 @@ on:
       - 'v*'
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies (with native better-sqlite3)
+        run: npm ci
+
+      - name: Typecheck + lint
+        run: |
+          npx tsc --noEmit
+          npm run lint
+
+      - name: Run automated tests
+        run: |
+          npm run test:db
+          npm run test:products
+          npm run test:ui
+          npm run test:stock
+          npm run test:sales
+          npm run test:exports
+          npm run test:expenses
+          npm run test:statistics
+          npm run test:distributors
+          npm run test:settings
+          npm run test:backup
+
   build-windows:
+    needs: test
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -27,23 +62,16 @@ jobs:
         with:
           workspaces: src-tauri
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install JS deps without native postinstalls
+        run: npm ci --ignore-scripts
 
-      - name: Run automated tests
-        run: |
-          npm run test:db
-          npm run test:products
-          npm run test:stock
-          npm run test:sales
-          npm run test:exports
-          npm run test:expenses
-          npm run test:statistics
-          npm run test:distributors
-          npm run test:settings
-          npm run test:backup
+      - name: Rebuild only the scripts the static export needs
+        run: node node_modules/esbuild/install.js || true
 
-      - name: Build Tauri app (NSIS + MSI)
+      - name: Verify Next.js static export builds on Windows
+        run: npm run build
+
+      - name: Build Tauri app (NSIS + MSI) and release
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -53,6 +81,7 @@ jobs:
           releaseBody: 'Windows installer for the sports-store desktop app.'
           releaseDraft: true
           prerelease: false
+          includeUpdaterManifest: false
 
       - name: Upload installers as artifacts
         uses: actions/upload-artifact@v4

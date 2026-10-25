@@ -519,3 +519,9 @@ FAM | META SEQ | SST SEQ         | RANGE
   0 | 00000267 | 00000266 SST    |                                                                             O                        | c44bdff4074eecdb-c44bdff4074eecdb (0 MiB, fresh, 38 bytes, 1 entries, 0 tombstones)
   2 | 00000268 | 00000265 SST    |    [=================================================================================]               | 090ba600c3820fc2-db02334e96d65708 (0 MiB, fresh, 21208 bytes, 4 entries, 0 tombstones)
   1 | 00000269 | 00000264 SST    | [==================================================================================================] | 00081b77e5f7a1fb-fff434a69a7d600f (2 MiB, fresh, 2305132 bytes, 16907 entries, 0 tombstones)
+Time 2026-10-25T13:47:31.796663171Z
+Commit 00000275 16705 keys in 314µs 896ns
+FAM | META SEQ | SST SEQ         | RANGE
+  0 | 00000273 | 00000272 SST    |                                                                             O                        | c44bdff4074eecdb-c44bdff4074eecdb (0 MiB, fresh, 38 bytes, 1 entries, 0 tombstones)
+  2 | 00000274 | 00000270 SST    |    [=================================================================================]               | 090ba600c3820fc2-db02334e96d65708 (0 MiB, fresh, 20677 bytes, 3 entries, 0 tombstones)
+  1 | 00000275 | 00000271 SST    | [==================================================================================================] | 00081b77e5f7a1fb-ffee3f1793074004 (2 MiB, fresh, 2257697 bytes, 16701 entries, 0 tombstones)
