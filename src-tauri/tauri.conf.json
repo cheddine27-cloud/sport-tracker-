@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "إدارة المحل الرياضي",
+  "productName": "SportsStore",
   "version": "1.0.0",
   "mainBinaryName": "sports-store",
   "identifier": "com.sportsstore.app",
@@ -29,9 +29,9 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "msi"],
+    "targets": ["nsis"],
     "publisher": "Sports Store",
-    "shortDescription": "تطبيق إدارة المحل الرياضي - يعمل دون إنترنت",
+    "shortDescription": "Sports shop inventory and sales manager",
     "windows": {
       "webviewInstallMode": {
         "type": "embedBootstrapper"
