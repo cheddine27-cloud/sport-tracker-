@@ -95,6 +95,54 @@ check('NewOrderDialog imports getProducts', nodSrc.includes('getProducts'));
 check('NewOrderDialog save button label', nodSrc.includes('حفظ الطلب'));
 check('NewOrderDialog has no ComingSoon', !nodSrc.includes('قريبا'));
 
+// ===== Expenses UI (src/app/expenses/page.tsx) =====
+const expensesPath = join(root, 'src/app/expenses/page.tsx');
+const expensesSrc = existsSync(expensesPath) ? readFileSync(expensesPath, 'utf8') : '';
+check('expenses page exists', expensesSrc.length > 0);
+check('expenses page is not a placeholder', !expensesSrc.includes('ComingSoon'));
+check('expenses page imports expenses service', expensesSrc.includes('@/services/expenses'));
+for (const label of ['المصاريف والأرباح', 'تكلفة المخزون الحالي', 'إجمالي المبيعات', 'تكلفة المبيعات', 'الربح الإجمالي', 'المصاريف الإضافية', 'صافي الربح', 'حسب المنتج', 'مصاريف إضافية', 'هذا الأسبوع']) {
+  check(`expenses label "${label}"`, expensesSrc.includes(label));
+}
+check('no dynamic route /expenses/[id]', !existsSync(join(root, 'src/app/expenses/[id]')));
+
+// ===== Statistics UI (src/app/statistics/page.tsx) =====
+const statsPath = join(root, 'src/app/statistics/page.tsx');
+const statsSrc = existsSync(statsPath) ? readFileSync(statsPath, 'utf8') : '';
+check('statistics page exists', statsSrc.length > 0);
+check('statistics page is not a placeholder', !statsSrc.includes('ComingSoon'));
+check('statistics page imports statistics service', statsSrc.includes('@/services/statistics'));
+check('statistics page uses recharts', statsSrc.includes("'recharts'"));
+for (const label of ['الإحصائيات', 'مجموع البيع في المحل', 'مجموع البيع خارج المحل', 'إجمالي المبيعات', 'صافي الربح', 'طلبات قيد الانتظار', 'أكثر المنتجات مبيعا', 'منتجات راكدة', 'تنبيهات المخزون', 'هذه السنة']) {
+  check(`statistics label "${label}"`, statsSrc.includes(label));
+}
+check('no dynamic route /statistics/[id]', !existsSync(join(root, 'src/app/statistics/[id]')));
+
+// ===== POS UI (src/app/pos/page.tsx) =====
+const posPath = join(root, 'src/app/pos/page.tsx');
+const posSrc = existsSync(posPath) ? readFileSync(posPath, 'utf8') : '';
+check('pos page exists', posSrc.length > 0);
+check('pos page is not a placeholder', !posSrc.includes('ComingSoon'));
+check('pos page imports sales service', posSrc.includes('@/services/sales'));
+check('pos page calls createStoreSale', posSrc.includes('createStoreSale'));
+for (const label of ['البيع في المحل', 'تأكيد البيع', 'مبيعات اليوم', 'السلة', 'إلغاء']) {
+  check(`pos label "${label}"`, posSrc.includes(label));
+}
+check('no dynamic route /pos/[id]', !existsSync(join(root, 'src/app/pos/[id]')));
+
+// ===== Distributors UI (src/app/distributors/page.tsx) =====
+const distPath = join(root, 'src/app/distributors/page.tsx');
+const distSrc = existsSync(distPath) ? readFileSync(distPath, 'utf8') : '';
+check('distributors page exists', distSrc.length > 0);
+check('distributors page is not a placeholder', !distSrc.includes('ComingSoon'));
+check('distributors page imports distributors service', distSrc.includes('@/services/distributors'));
+check('distributors page imports openUrl from plugin-opener', distSrc.includes('@tauri-apps/plugin-opener') && distSrc.includes('openUrl'));
+check('distributors page imports phone helper', distSrc.includes('@/lib/phone'));
+for (const label of ['الموزعون', 'إضافة موزع', 'واتساب', 'رسالة فارغة']) {
+  check(`distributors label "${label}"`, distSrc.includes(label));
+}
+check('no dynamic route /distributors/[id]', !existsSync(join(root, 'src/app/distributors/[id]')));
+
 // RTL logical utilities only (no physical mr-/ml-/pl-/pr- class prefixes)
 const rtlViolations = [...allUi.matchAll(/className="[^"]*\b(?:mr|ml|pl|pr)-[\d.]/g)];
 check('no physical margin/padding utilities (mr-, ml-, pl-, pr-)', rtlViolations.length === 0);

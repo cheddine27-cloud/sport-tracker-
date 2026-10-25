@@ -46,3 +46,18 @@ export const STOCK_STATUS_LABELS: Record<'ok' | 'low' | 'out', string> = {
   low: 'قارب على النفاد',
   out: 'نفد',
 };
+
+/** Quick WhatsApp message templates for distributors (editable here). */
+export const WHATSAPP_MESSAGE_TEMPLATES: { key: string; label: string; message: string }[] = [
+  { key: 'empty', label: 'رسالة فارغة', message: '' },
+  {
+    key: 'prices',
+    label: 'الاطلاع على الأسعار',
+    message: 'السلام عليكم، أريد الاطلاع على الأسعار الجديدة',
+  },
+  {
+    key: 'order',
+    label: 'طلب كمية جديدة',
+    message: 'السلام عليكم، أريد طلب كمية جديدة من المنتجات',
+  },
+];

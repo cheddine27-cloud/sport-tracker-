@@ -76,7 +76,10 @@ export interface SaleItem {
 export interface Distributor {
   id: number;
   name: string;
+  /** normalized number, digits only with country code (213...) */
   whatsapp: string;
+  /** original display format as entered by the user */
+  display?: string;
   note: string | null;
   created_at: string;
 }
