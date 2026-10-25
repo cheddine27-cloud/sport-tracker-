@@ -1,0 +1,27 @@
+[package]
+name = "sports-store"
+version = "0.1.0"
+description = "إدارة المحل الرياضي - Sports equipment store management desktop app"
+authors = ["you"]
+license = ""
+repository = ""
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.5.7", features = [] }
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+log = "0.4"
+tauri = { version = "2.9.5", features = [] }
+tauri-plugin-log = "2"
+tauri-plugin-sql = { version = "2", features = ["sqlite"] }
+tauri-plugin-opener = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-dialog = "2"

@@ -1,0 +1,8 @@
+/** @deprecated Renamed to `ClockHour5Icon`; this file will be removed in the next major version. */
+const ClockHourFiveIcon = [
+  ["circle", { cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "0" }],
+  ["path", { d: "M12 6V12L14 15.5", stroke: "currentColor", strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "1.5", key: "1" }]
+];
+
+export { ClockHourFiveIcon as default };
+//# sourceMappingURL=ClockHourFiveIcon.js.map
