@@ -19,13 +19,14 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install dependencies (with native better-sqlite3)
+      - name: Install dependencies
         run: npm ci
 
-      - name: Typecheck + lint
-        run: |
-          npx tsc --noEmit
-          npm run lint
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
 
       - name: Run automated tests
         run: |
@@ -62,32 +63,23 @@ jobs:
         with:
           workspaces: src-tauri
 
-      - name: Install JS deps without native postinstalls
+      - name: Install dependencies (skip native test deps)
         run: npm ci --ignore-scripts
 
-      - name: Rebuild only the scripts the static export needs
-        run: node node_modules/esbuild/install.js || true
-
-      - name: Verify Next.js static export builds on Windows
-        run: npm run build
-
-      - name: Build Tauri app (NSIS + MSI) and release
+      - name: Build Tauri app (NSIS)
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || '' }}
-          releaseName: ${{ startsWith(github.ref, 'refs/tags/v') && format('إدارة المحل الرياضي {0}', github.ref_name) || '' }}
+          releaseName: ${{ startsWith(github.ref, 'refs/tags/v') && format('Sports Store {0}', github.ref_name) || '' }}
           releaseBody: 'Windows installer for the sports-store desktop app.'
           releaseDraft: true
           prerelease: false
-          includeUpdaterManifest: false
 
-      - name: Upload installers as artifacts
+      - name: Upload installer as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-installers
-          path: |
-            src-tauri/target/release/bundle/nsis/*.exe
-            src-tauri/target/release/bundle/msi/*.msi
+          name: windows-installer
+          path: src-tauri/target/release/bundle/nsis/*.exe
           if-no-files-found: error
