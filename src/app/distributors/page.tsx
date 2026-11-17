@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { MessageCircle, Pencil, Plus, Search, Trash2, Loader2 } from 'lucide-react';
-import { openUrl } from '@tauri-apps/plugin-opener';
+import { openUrl } from '@/lib/opener';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

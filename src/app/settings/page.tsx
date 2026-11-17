@@ -15,7 +15,7 @@ import { getSettings, updateSettings, setSetting, type ShopSettings } from '@/se
 import { manualBackupTo, restoreFrom, runAutoBackupIfNeeded } from '@/lib/backupOps';
 import { verifyStockIntegrity } from '@/services/stock';
 import { formatDate } from '@/lib/format';
-import { save, open } from '@tauri-apps/plugin-dialog';
+import { save, open } from '@/lib/dialog';
 import { DatabaseBackup } from 'lucide-react';
 
 export default function SettingsPage() {

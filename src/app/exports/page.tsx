@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { MessageCircle, Loader2 } from 'lucide-react';
-import { openUrl } from '@tauri-apps/plugin-opener';
+import { openUrl } from '@/lib/opener';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
