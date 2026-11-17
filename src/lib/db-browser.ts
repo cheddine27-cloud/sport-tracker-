@@ -1,4 +1,4 @@
-// Browser Mock Database with full SQL support & reactive state
+// Browser Mock Database with fast, ultra-light in-memory SQL handler
 import type { DbAdapter, ExecuteResult } from '@/services/dbAdapter';
 import type { Category, Product, StockMovement, Sale, SaleItem, Distributor, Expense } from '@/types';
 
@@ -270,25 +270,52 @@ class MockDatabase implements DbAdapter {
   async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
     const s = sql.toLowerCase().trim();
 
-    // 1. Categories
+    // 1. Inventory Summary (Specific aggregate)
+    if (s.includes("from products") && s.includes("stockvalueatcost")) {
+      const active = this.products.filter(p => p.is_active === 1);
+      const totalUnits = active.reduce((sum, p) => sum + p.quantity, 0);
+      const stockValueAtCost = active.reduce((sum, p) => sum + (p.quantity * p.purchase_price), 0);
+      const stockValueAtSale = active.reduce((sum, p) => sum + (p.quantity * p.sale_price), 0);
+      const lowStockCount = active.filter(p => p.quantity > 0 && p.quantity <= p.low_stock_threshold).length;
+      const outOfStockCount = active.filter(p => p.quantity === 0).length;
+
+      return [
+        {
+          totalProducts: active.length,
+          totalUnits,
+          stockValueAtCost,
+          stockValueAtSale,
+          lowStockCount,
+          outOfStockCount
+        }
+      ] as unknown as T[];
+    }
+
+    // 2. Categories
     if (s.includes("from categories")) {
       return [...this.categories] as unknown as T[];
     }
 
-    // 2. Settings
+    // 3. Settings
     if (s.includes("from settings")) {
       const rows = Object.entries(this.settings).map(([key, value]) => ({ key, value }));
       return rows as unknown as T[];
     }
 
-    // 3. Products
+    // 4. Products query (support filters and joins)
     if (s.includes("from products")) {
       let res = this.products.map(p => {
         const cat = this.categories.find(c => c.id === p.category_id);
-        return { ...p, categoryName: cat?.name ?? "عام" };
+        const status = p.quantity === 0 ? 'out' : p.quantity <= p.low_stock_threshold ? 'low' : 'ok';
+        return {
+          ...p,
+          categoryName: cat?.name ?? "عام",
+          status,
+          stockValueAtCost: p.quantity * p.purchase_price,
+          stockValueAtSale: p.quantity * p.sale_price
+        };
       });
 
-      // Filter by category_id if present
       if (params && params.length > 0) {
         if (s.includes("where id =") || s.includes("where p.id =")) {
           const id = Number(params[0]);
@@ -300,7 +327,7 @@ class MockDatabase implements DbAdapter {
       return res as unknown as T[];
     }
 
-    // 4. Sales & Sale items
+    // 5. Sales & Sale items
     if (s.includes("from sales") || s.includes("from sale_items")) {
       if (s.includes("where s.id =") || s.includes("where id =")) {
         const id = Number(params[0]);
@@ -310,17 +337,17 @@ class MockDatabase implements DbAdapter {
       return this.sales as unknown as T[];
     }
 
-    // 5. Distributors
+    // 6. Distributors
     if (s.includes("from distributors")) {
       return this.distributors as unknown as T[];
     }
 
-    // 6. Expenses
+    // 7. Expenses
     if (s.includes("from expenses")) {
       return this.expenses as unknown as T[];
     }
 
-    // 7. Stock movements
+    // 8. Stock movements
     if (s.includes("from stock_movements")) {
       const res = this.movements.map(m => {
         const prod = this.products.find(p => p.id === m.product_id);
@@ -333,7 +360,7 @@ class MockDatabase implements DbAdapter {
       return res as unknown as T[];
     }
 
-    // Aggregates / Counts fallback
+    // 9. Generic count fallback
     if (s.includes("count(*)")) {
       return [{ count: 0 }] as unknown as T[];
     }
@@ -448,7 +475,7 @@ class MockDatabase implements DbAdapter {
       return { rowsAffected: 1 };
     }
 
-    // 11. Add Sale
+    // 11. Add Sale (Store or Outside)
     if (s.startsWith("insert into sales")) {
       const newId = this.sales.length ? Math.max(...this.sales.map(s => s.id)) + 1 : 101;
       return { rowsAffected: 1, lastInsertId: newId };

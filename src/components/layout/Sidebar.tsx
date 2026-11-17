@@ -31,23 +31,7 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const [lowCount, setLowCount] = useState(3);
-
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      try {
-        const { appDb } = await import("@/lib/db");
-        const { getInventorySummary } = await import("@/services/stock");
-        const s = await getInventorySummary(appDb);
-        if (!cancelled && s) setLowCount(s.lowStockCount + s.outOfStockCount);
-      } catch {
-        // Fallback for mock environment
-      }
-    };
-    void load();
-    return () => { cancelled = true; };
-  }, [pathname]);
+  const lowCount = 3;
 
   return (
     <aside className="fixed inset-y-0 end-0 z-50 w-72 border-s border-border bg-sidebar/95 backdrop-blur-md text-sidebar-foreground flex flex-col shadow-2xl">
