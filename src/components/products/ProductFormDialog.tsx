@@ -25,10 +25,8 @@ import { appDb } from "@/lib/db";
 import { formatMoney } from "@/lib/format";
 import {
   createProduct,
-  findSimilarProducts,
   generateSku,
   updateProduct,
-  validateProductInput,
   type ProductInput,
 } from "@/services/products";
 
@@ -176,7 +174,17 @@ export function ProductFormDialog({
         };
 
         if (isEdit && product) {
-          const { quantity: _q, ...rest } = input;
+          const rest = {
+            sku: input.sku,
+            name: input.name,
+            categoryId: input.categoryId,
+            size: input.size,
+            color: input.color,
+            material: input.material,
+            purchasePrice: input.purchasePrice,
+            salePrice: input.salePrice,
+            lowStockThreshold: input.lowStockThreshold,
+          };
           await updateProduct(appDb, product.id, rest);
           toast.success("تم تحديث بيانات المنتج بنجاح");
         } else {

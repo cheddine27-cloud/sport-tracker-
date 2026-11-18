@@ -7,9 +7,12 @@ export type Tx = DbAdapter;
 
 const isTauri = typeof window !== 'undefined' && ('__TAURI__' in window || '__TAURI_INTERNALS__' in window);
 
-let tauriDbInstance: any = null;
+type TauriSqlPlugin = typeof import('@tauri-apps/plugin-sql');
+type TauriDatabase = InstanceType<TauriSqlPlugin['default']>;
 
-async function getTauriDb() {
+let tauriDbInstance: TauriDatabase | null = null;
+
+async function getTauriDb(): Promise<TauriDatabase> {
   if (!tauriDbInstance) {
     const Database = (await import('@tauri-apps/plugin-sql')).default;
     tauriDbInstance = await Database.load('sqlite:sports_store.db');

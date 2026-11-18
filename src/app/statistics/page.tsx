@@ -20,7 +20,7 @@ import {
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
-import { Printer, TrendingUp, AlertTriangle } from 'lucide-react';
+import { Printer } from 'lucide-react';
 import { appDb } from '@/lib/db';
 import { formatMoney } from '@/lib/format';
 import { printInvoice } from '@/lib/invoice';
