@@ -30,6 +30,14 @@ export async function execute(sql: string, params: unknown[] = []): Promise<Exec
   return appDb.execute(sql, params);
 }
 
+export async function getDb(): Promise<DbAdapter> {
+  return appDb;
+}
+
+export async function withTransaction<T>(fn: (tx: DbAdapter) => Promise<T>): Promise<T> {
+  return appDb.transaction(fn);
+}
+
 export const appDb: DbAdapter = {
   async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
     if (isTauri) {

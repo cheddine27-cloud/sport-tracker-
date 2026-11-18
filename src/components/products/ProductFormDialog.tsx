@@ -330,16 +330,28 @@ export function ProductFormDialog({
                 />
               </div>
               {!isEdit && (
-                <div className="grid gap-1.5 col-span-2">
-                  <Label htmlFor="p-qty">الكمية الابتدائية بالمخزن</Label>
-                  <Input
-                    id="p-qty"
-                    type="number"
-                    min={0}
-                    value={form.quantity}
-                    onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))}
-                  />
-                </div>
+                <>
+                  <div className="grid gap-1.5 col-span-2">
+                    <Label htmlFor="p-qty">الكمية الأولية بالمخزن</Label>
+                    <Input
+                      id="p-qty"
+                      type="number"
+                      min={0}
+                      value={form.quantity}
+                      onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))}
+                    />
+                  </div>
+                  <div className="grid gap-1.5 col-span-1">
+                    <Label htmlFor="p-threshold">حد التنبيه</Label>
+                    <Input
+                      id="p-threshold"
+                      type="number"
+                      min={0}
+                      value={form.lowStockThreshold}
+                      onChange={(e) => setForm((f) => ({ ...f, lowStockThreshold: e.target.value }))}
+                    />
+                  </div>
+                </>
               )}
             </div>
           ) : (
