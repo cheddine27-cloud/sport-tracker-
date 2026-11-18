@@ -150,8 +150,8 @@ export default function DashboardPage() {
             <p className="text-sm text-muted-foreground py-4 text-center">كل الكميات ضمن الحدود الآمنة ✅</p>
           ) : (
             <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-              {lowStock.slice(0, 9).map((p) => (
-                <div key={p.id} className="flex items-center justify-between rounded-lg border p-3 text-sm">
+              {lowStock.slice(0, 9).map((p, idx) => (
+                <div key={p.id ? `${p.id}-${idx}` : `low-stock-${idx}`} className="flex items-center justify-between rounded-lg border p-3 text-sm">
                   <div>
                     <div className="font-semibold">{p.name}</div>
                     <div className="text-xs text-muted-foreground">{p.sku} · المتبقي: {p.quantity}</div>

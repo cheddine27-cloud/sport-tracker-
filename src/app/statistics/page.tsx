@@ -290,7 +290,7 @@ function StatsInner() {
                   <Table>
                     <TableHeader><TableRow><TableHead>المنتج</TableHead><TableHead>الكمية</TableHead></TableRow></TableHeader>
                     <TableBody>
-                      {slow.slice(0, 8).map((s) => <TableRow key={s.product_id}><TableCell>{s.name}</TableCell><TableCell>{s.quantity}</TableCell></TableRow>)}
+                      {slow.slice(0, 8).map((s, idx) => <TableRow key={s.product_id ? `${s.product_id}-${idx}` : `slow-${idx}`}><TableCell>{s.name}</TableCell><TableCell>{s.quantity}</TableCell></TableRow>)}
                     </TableBody>
                   </Table>
                 )}
@@ -304,8 +304,8 @@ function StatsInner() {
                   <Table>
                     <TableHeader><TableRow><TableHead>المنتج</TableHead><TableHead>الحالة</TableHead></TableRow></TableHeader>
                     <TableBody>
-                      {alerts.slice(0, 8).map((a) => (
-                        <TableRow key={a.product_id}>
+                      {alerts.slice(0, 8).map((a, idx) => (
+                        <TableRow key={a.product_id ? `${a.product_id}-${idx}` : `alert-${idx}`}>
                           <TableCell>{a.name}</TableCell>
                           <TableCell>{a.quantity <= 0 ? <Badge className="bg-red-100 text-red-800">نفد</Badge> : <Badge className="bg-orange-100 text-orange-800">قارب على النفاد ({a.quantity})</Badge>}</TableCell>
                         </TableRow>
