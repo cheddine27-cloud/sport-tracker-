@@ -125,8 +125,13 @@ export default function ExportsPage() {
     }
   };
 
-  const openWhatsApp = async (phone: string | null) => {
-    const url = whatsappUrl(phone);
+  const openWhatsApp = async (s: SaleWithItems) => {
+    if (!s.customer_phone) {
+      toast.error('لا يوجد رقم هاتف لهذا الزبون');
+      return;
+    }
+    const msg = `مرحباً ${s.customer_name || 'زبوننا العزيز'} 👋\nنود إعلامك بحالة طلبك #${s.id} بمبلغ ${s.total.toLocaleString()} دج.\n📦 الأصناف: ${itemsSummary(s)}\nشكراً لتعاملك مع متجرنا!`;
+    const url = whatsappUrl(s.customer_phone, msg);
     if (!url) {
       toast.error('رقم الهاتف غير صالح للواتساب');
       return;
@@ -228,9 +233,10 @@ export default function ExportsPage() {
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="h-7 w-7 text-green-600 ms-1"
-                          onClick={() => void openWhatsApp(s.customer_phone)}
-                          aria-label="مراسلة عبر واتساب"
+                          className="h-7 w-7 text-green-500 hover:text-green-400 hover:bg-green-500/10 ms-1"
+                          onClick={() => void openWhatsApp(s)}
+                          aria-label="مراسلة تفاصيل الطلب عبر واتساب"
+                          title="إرسال إشعار الطلب للزبون عبر واتساب"
                         >
                           <MessageCircle className="h-4 w-4" />
                         </Button>

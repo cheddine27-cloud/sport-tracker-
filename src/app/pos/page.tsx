@@ -54,6 +54,7 @@ export default function PosPage() {
   const [todaySales, setTodaySales] = useState<SaleWithItems[]>([]);
   const [shopInfo, setShopInfo] = useState<ShopSettings | null>(null);
   const [cancelTarget, setCancelTarget] = useState<SaleWithItems | null>(null);
+  const [printFormat, setPrintFormat] = useState<"80mm" | "58mm" | "a5">("80mm");
   const searchRef = useRef<HTMLInputElement>(null);
 
   const loadToday = useCallback(async () => {
@@ -190,7 +191,7 @@ export default function PosPage() {
       const sale = await getSaleById(appDb, saleId);
       if (!sale) return toast.error("تعذر تحميل الفاتورة");
       const shop = shopInfo ?? await getSettings(appDb);
-      await printInvoice(buildInvoiceHtml(sale, shop));
+      await printInvoice(buildInvoiceHtml(sale, shop, { format: printFormat }));
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "تعذر الطباعة.");
     }
@@ -348,7 +349,22 @@ export default function PosPage() {
       {/* Today's sales */}
       <Card className="mt-6">
         <CardContent className="pt-6">
-          <h3 className="mb-3 font-semibold">مبيعات اليوم</h3>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h3 className="font-semibold">مبيعات اليوم</h3>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="printFormat" className="text-xs text-muted-foreground">نوع الطابعة:</Label>
+              <select
+                id="printFormat"
+                value={printFormat}
+                onChange={(e) => setPrintFormat(e.target.value as "80mm" | "58mm" | "a5")}
+                className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+              >
+                <option value="80mm">طابعة حرارية 80mm (قياسي)</option>
+                <option value="58mm">طابعة حرارية 58mm (إيصال صغير)</option>
+                <option value="a5">ورق رسمي A5 / فواتير</option>
+              </select>
+            </div>
+          </div>
           {todaySales.length === 0 ? (
             <p className="py-6 text-center text-sm text-muted-foreground">لا توجد مبيعات اليوم بعد.</p>
           ) : (

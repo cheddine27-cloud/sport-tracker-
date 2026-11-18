@@ -1,4 +1,4 @@
-// ===== Shared Arabic labels (movement types, sale types/status, stock status) =====
+// ===== Shared Arabic labels (movement types, sale types/status, stock status, delivery) =====
 
 import type { MovementType, SaleStatus, SaleType } from '@/types';
 
@@ -7,57 +7,74 @@ export const MOVEMENT_TYPE_LABELS: Record<MovementType, string> = {
   restock: 'تزويد',
   sale_store: 'بيع في المحل',
   sale_outside: 'بيع خارجي',
-  adjustment: 'تعديل',
-  return: 'إرجاع',
+  adjustment: 'تعديل جرد',
+  return: 'إرجاع منتج',
   cancel_return: 'إلغاء طلب',
 };
 
-/** Tailwind classes for a colored badge per movement type. */
+/** Dark modern classes for movement type badges */
 export const MOVEMENT_TYPE_BADGE: Record<MovementType, string> = {
-  initial: 'bg-blue-100 text-blue-800 border-blue-200',
-  restock: 'bg-green-100 text-green-800 border-green-200',
-  sale_store: 'bg-violet-100 text-violet-800 border-violet-200',
-  sale_outside: 'bg-purple-100 text-purple-800 border-purple-200',
-  adjustment: 'bg-amber-100 text-amber-800 border-amber-200',
-  return: 'bg-cyan-100 text-cyan-800 border-cyan-200',
-  cancel_return: 'bg-red-100 text-red-800 border-red-200',
+  initial: 'bg-blue-500/15 text-blue-400 border border-blue-500/30',
+  restock: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
+  sale_store: 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30',
+  sale_outside: 'bg-purple-500/15 text-purple-400 border border-purple-500/30',
+  adjustment: 'bg-amber-500/15 text-amber-400 border border-amber-500/30',
+  return: 'bg-teal-500/15 text-teal-400 border border-teal-500/30',
+  cancel_return: 'bg-red-500/15 text-red-400 border border-red-500/30',
 };
 
 export const SALE_TYPE_LABELS: Record<SaleType, string> = {
-  store: 'بيع في المحل',
-  outside: 'بيع خارجي',
+  store: 'بيع مباشر بالمحل',
+  outside: 'طلب توصيل خارجي',
 };
 
 export const SALE_STATUS_LABELS: Record<SaleStatus, string> = {
-  pending: 'قيد الانتظار',
-  confirmed: 'مؤكد',
-  cancelled: 'ملغى',
+  pending: 'قيد التجهيز / الإرسال',
+  confirmed: 'تم التسليم بنجاح',
+  cancelled: 'ملغي / مسترجع',
 };
 
-/** Tailwind classes for a colored status badge (yellow / green / gray). */
+/** Dark modern status badges */
 export const SALE_STATUS_BADGE: Record<SaleStatus, string> = {
-  pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  confirmed: 'bg-green-100 text-green-800 border-green-200',
-  cancelled: 'bg-gray-100 text-gray-600 border-gray-200',
+  pending: 'bg-amber-500/15 text-amber-400 border border-amber-500/30',
+  confirmed: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
+  cancelled: 'bg-zinc-800 text-zinc-400 border border-zinc-700',
 };
 
 export const STOCK_STATUS_LABELS: Record<'ok' | 'low' | 'out', string> = {
   ok: 'متوفر',
   low: 'قارب على النفاد',
-  out: 'نفد',
+  out: 'نفد من المخزن',
 };
 
-/** Quick WhatsApp message templates for distributors (editable here). */
+/** WhatsApp message generators for Customers and Delivery */
+export function buildCustomerOrderWhatsApp(order: {
+  id: number;
+  customer_name?: string | null;
+  total: number;
+  itemsSummary: string;
+}): string {
+  return encodeURIComponent(
+    `مرحباً ${order.customer_name || 'زبوننا العزيز'} 👋\n\nنود إعلامك بأن طلبك رقم #${order.id} من متجرنا الرياضي قيد التجهيز:\n📦 الطلبات: ${order.itemsSummary}\n💰 المبلغ المستحق: ${order.total.toLocaleString()} دج\n\nشكراً لثقتكم واختياركم لنا! 🏃‍♂️`
+  );
+}
+
+/** Quick WhatsApp message templates for distributors & suppliers */
 export const WHATSAPP_MESSAGE_TEMPLATES: { key: string; label: string; message: string }[] = [
   { key: 'empty', label: 'رسالة فارغة', message: '' },
   {
     key: 'prices',
-    label: 'الاطلاع على الأسعار',
-    message: 'السلام عليكم، أريد الاطلاع على الأسعار الجديدة',
+    label: 'الاطلاع على الأسعار الجديدة',
+    message: 'السلام عليكم، يرجى تزويدنا بجدول الأسعار وقائمة المنتجات المتوفرة حالياً.',
   },
   {
     key: 'order',
-    label: 'طلب كمية جديدة',
-    message: 'السلام عليكم، أريد طلب كمية جديدة من المنتجات',
+    label: 'طلبية سلعة وتزويد مخزون',
+    message: 'السلام عليكم، نحتاج تزويد وتجهيز شحنة جديدة لمحلنا في أقرب وقت.',
+  },
+  {
+    key: 'tracking',
+    label: 'متابعة شحنة التوصيل',
+    message: 'السلام عليكم، نود الاستفسار عن كود تتبع شحنة السلع المرسلة.',
   },
 ];

@@ -15,10 +15,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from '@/components/ui/dialog';
+import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
+import { Printer, TrendingUp, AlertTriangle } from 'lucide-react';
 import { appDb } from '@/lib/db';
 import { formatMoney } from '@/lib/format';
+import { printInvoice } from '@/lib/invoice';
 import {
   getChannelSummary, getSalesTimeSeries, getTopProducts, getCategoryBreakdown,
   getSlowMovingProducts, getStockAlerts,
@@ -77,6 +82,7 @@ function StatsInner() {
   const [slow, setSlow] = useState<SlowMovingRow[]>([]);
   const [alerts, setAlerts] = useState<ProductFinancialRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showZReport, setShowZReport] = useState(false);
 
   const range = useMemo(() => periodRange(period, customFrom, customTo), [period, customFrom, customTo]);
 
@@ -120,6 +126,38 @@ function StatsInner() {
     { label: 'طلبات قيد الانتظار', value: summary?.pendingExpectedRevenue, sub: summary ? `${summary.pendingCount} طلب` : undefined },
   ];
 
+  const printZReport = () => {
+    const todayStr = iso(new Date());
+    const html = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <title>تقرير إغلاق الصندوق (Z-Report)</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; color: #111; margin: 15px; direction: rtl; }
+    .header { text-align: center; border-bottom: 2px dashed #333; padding-bottom: 10px; margin-bottom: 12px; }
+    .row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dotted #ccc; }
+    .total-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 16px; font-weight: bold; border-top: 2px solid #000; margin-top: 10px; }
+    .badge { font-weight: bold; background: #eee; padding: 2px 6px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2 style="margin:0 0 4px;">تقرير إغلاق الصندوق (Z-Report)</h2>
+    <div>التاريخ: ${todayStr}</div>
+  </div>
+  <div class="row"><span>مبيعات المحل (POS):</span> <b>${formatMoney(summary?.store.revenue ?? 0)}</b></div>
+  <div class="row"><span>مبيعات الصادرات / التوصيل:</span> <b>${formatMoney(summary?.outside.revenue ?? 0)}</b></div>
+  <div class="row"><span>إجمالي المداخيل:</span> <b>${formatMoney(summary?.combined.revenue ?? 0)}</b></div>
+  <div class="row"><span>تكلفة البضاعة المباعة:</span> <b>${formatMoney(summary?.combined.cost ?? 0)}</b></div>
+  <div class="row"><span>مصاريف إضافية:</span> <b>${formatMoney(summary?.extraExpenses ?? 0)}</b></div>
+  <div class="total-row"><span>صافي الأرباح الصافية:</span> <span>${formatMoney(summary?.netProfit ?? 0)}</span></div>
+  <p style="text-align: center; margin-top: 20px; font-size: 11px; color: #666;">تم استخراج التقرير آلياً بواسطة Sport Tracker</p>
+</body>
+</html>`;
+    void printInvoice(html);
+  };
+
   return (
     <>
       <PageHeader title="الإحصائيات" description="رسوم بيانية وجداول للمبيعات والأرباح" />
@@ -140,6 +178,9 @@ function StatsInner() {
           <option value="week">أسبوعي</option>
           <option value="month">شهري</option>
         </select>
+        <Button size="sm" variant="default" className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5" onClick={() => setShowZReport(true)}>
+          <Printer className="h-4 w-4" /> تقرير إغلاق الصندوق (Z-Report)
+        </Button>
       </div>
 
       {loading ? (
@@ -277,6 +318,52 @@ function StatsInner() {
           </div>
         </>
       )}
+      {/* Z-Report Dialog */}
+      <Dialog open={showZReport} onOpenChange={setShowZReport}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Printer className="h-5 w-5 text-emerald-500" />
+              تقرير إغلاق الصندوق اليومي (Z-Report)
+            </DialogTitle>
+            <DialogDescription>
+              ملخص كامل لتدفقات النقدية والمبيعات والأرباح لليوم.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-3 border-y text-sm">
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">مبيعات المحل (POS):</span>
+              <span className="font-semibold">{formatMoney(summary?.store.revenue ?? 0)}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-muted-foreground">مبيعات الصادرات / التوصيل:</span>
+              <span className="font-semibold">{formatMoney(summary?.outside.revenue ?? 0)}</span>
+            </div>
+            <div className="flex justify-between items-center border-t pt-2 font-medium">
+              <span>إجمالي المداخيل:</span>
+              <span className="text-emerald-500 font-bold">{formatMoney(summary?.combined.revenue ?? 0)}</span>
+            </div>
+            <div className="flex justify-between items-center text-muted-foreground">
+              <span>تكلفة السلع المباعة (COGS):</span>
+              <span>{formatMoney(summary?.combined.cost ?? 0)}</span>
+            </div>
+            <div className="flex justify-between items-center text-muted-foreground">
+              <span>مصاريف إضافية مسجلة:</span>
+              <span>{formatMoney(summary?.extraExpenses ?? 0)}</span>
+            </div>
+            <div className="flex justify-between items-center border-t pt-2 text-base font-bold text-emerald-400">
+              <span>صافي الأرباح الصافية اليومية:</span>
+              <span>{formatMoney(summary?.netProfit ?? 0)}</span>
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setShowZReport(false)}>إغلاق</Button>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-2" onClick={printZReport}>
+              <Printer className="h-4 w-4" /> طباعة إيصال Z-Report (80mm)
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
