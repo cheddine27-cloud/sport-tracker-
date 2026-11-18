@@ -26,9 +26,8 @@ export function buildInvoiceHtml(sale: SaleWithItems, shop: ShopSettings, option
 
   const itemsRows = (sale.items ?? [])
     .map(
-      (it, i) => `<tr>
-        <td class="text-center">${i + 1}</td>
-        <td class="item-name">${escapeHtml(it.product_name)}</td>
+      (it) => `<tr>
+        <td>${escapeHtml(it.product_name)}</td>
         <td class="text-center font-bold">${it.quantity}</td>
         <td class="text-left font-mono">${money(it.sale_price)}</td>
         <td class="text-left font-mono font-bold">${money(it.quantity * it.sale_price)}</td>
@@ -45,7 +44,7 @@ export function buildInvoiceHtml(sale: SaleWithItems, shop: ShopSettings, option
     : '';
 
   const isStore = sale.type === 'store';
-  const invoiceTypeTitle = isStore ? 'تذكرة بيع (Ticket de Caisse)' : 'وصل تسليم / تصدير (Bon de Livraison)';
+  const invoiceTypeTitle = isStore ? 'فاتورة بيع (Ticket de Caisse)' : 'وصل تسليم / تصدير (Bon de Livraison)';
   const statusBadge = sale.status === 'confirmed' ? 'مدفوع ومؤكد' : sale.status === 'pending' ? 'قيد الانتظار' : 'ملغى';
 
   // SVG QR Code simulation with invoice metadata
